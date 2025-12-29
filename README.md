@@ -1,5 +1,5 @@
 # Foundora
-Database group project for uni
+Database group project for Brac University, CSE 370
 
 This is a group project created by
 
