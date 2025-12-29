@@ -1,0 +1,910 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Foundora</title>
+  <link rel="shortcut icon" href="./favicon-32.png" type="image/x-icon">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ink: "#1B1532",
+            plum: "#2B1E4A",
+            softBlue: "#EAF4FF",
+            mist: "#F6FAFF",
+            mint: "#7BE0C3",
+            cyanSoft: "#B6ECFF",
+            lavender: "#C9C5FF",
+            peach: "#FFD5C8",
+          },
+          fontFamily: {
+            display: ["Poppins", "ui-sans-serif", "system-ui"],
+            sans: ["Inter", "ui-sans-serif", "system-ui"],
+          },
+          boxShadow: {
+            card: "0 14px 40px rgba(17, 12, 46, .10)",
+            soft: "0 22px 70px rgba(17, 12, 46, .14)",
+            glow: "0 18px 60px rgba(123,224,195,.32)",
+          },
+        },
+      },
+    };
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    html { scroll-behavior: smooth; }
+
+    .grain { position: relative; }
+    .grain::before{
+      content:"";
+      position:absolute; inset:0;
+      pointer-events:none;
+      opacity:.06;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+      mix-blend-mode:multiply;
+    }
+
+    /* Floating motion (Option 1) */
+    @keyframes floatY { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-16px)} }
+    @keyframes floatX { 0%,100%{transform:translateX(0)} 50%{transform:translateX(12px)} }
+    @keyframes floatR { 0%,100%{transform:rotate(0) translateY(0)} 50%{transform:rotate(2deg) translateY(-10px)} }
+    .float-slow { animation: floatY 8s ease-in-out infinite; }
+    .float-mid  { animation: floatX 10s ease-in-out infinite; }
+    .float-rot  { animation: floatR 12s ease-in-out infinite; }
+    @media (prefers-reduced-motion: reduce) {
+      .float-slow,.float-mid,.float-rot { animation: none !important; }
+      html { scroll-behavior: auto; }
+    }
+
+    /* Blob shapes */
+    .blob { border-radius: 62% 38% 55% 45% / 45% 55% 45% 55%; }
+    .blob2 { border-radius: 55% 45% 40% 60% / 55% 45% 55% 45%; }
+
+    /* Brush underline (mint/cyan) */
+    .brush { position: relative; display: inline-block; z-index: 0; }
+    .brush::after {
+      content:"";
+      position:absolute;
+      left:-.06em; right:-.06em;
+      bottom:.08em;
+      height:.35em;
+      border-radius:999px;
+      background: linear-gradient(90deg, rgba(123,224,195,.95), rgba(182,236,255,.85));
+      z-index:-1;
+      transform: rotate(-1.2deg);
+      filter: saturate(1.05);
+    }
+
+    /* dotted arc */
+    .dash-circle { border-radius: 9999px; border: 2px dashed rgba(43, 30, 74, 0.22); }
+
+    /* curve section */
+    .curveWrap { border-top-left-radius: 999px; border-top-right-radius: 999px; }
+
+    /* Reveal */
+    .reveal { opacity: 0; transform: translateY(14px); transition: 850ms ease; }
+    .reveal.show { opacity: 1; transform: translateY(0); }
+
+    /* Hide slider scrollbar */
+    .no-scrollbar::-webkit-scrollbar{ display:none; }
+    .no-scrollbar{ -ms-overflow-style:none; scrollbar-width:none; }
+  
+  /* Testimonials slider */
+  .t-wrap{
+    position: relative;
+    overflow: hidden;
+    border-radius: 24px;
+  }
+  .t-stage{
+    position: relative;
+    min-height: 190px; /* keeps height stable; adjust if needed */
+  }
+  .t-card{
+    position: absolute;
+    inset: 0;
+    border-radius: 24px;
+    background: white;
+    border: 1px solid rgba(15, 23, 42, .08);
+    box-shadow: 0 14px 40px rgba(17, 12, 46, .10);
+    padding: 28px;
+  }
+  .t-enter{
+    transform: translateX(110%);
+    opacity: 0;
+  }
+  .t-enter-active{
+    transform: translateX(0);
+    opacity: 1;
+    transition: transform 650ms ease, opacity 650ms ease;
+  }
+  .t-exit{
+    transform: translateX(0);
+    opacity: 1;
+  }
+  .t-exit-active{
+    transform: translateX(-110%);
+    opacity: 0;
+    transition: transform 650ms ease, opacity 650ms ease;
+  }
+  .t-dot{
+    width: 9px; height: 9px;
+    border-radius: 999px;
+    background: rgba(43, 30, 74, .22);
+  }
+  .t-dot.active{ background: #7BE0C3; }
+  @media (prefers-reduced-motion: reduce) {
+    .t-enter-active,.t-exit-active{ transition: none !important; }
+  }
+
+</style>
+
+  <style>
+    /* Navbar hover underline (mint) */
+    .nav-link{
+      position: relative;
+      padding-bottom: 6px;
+    }
+    .nav-link::after{
+      content:"";
+      position:absolute;
+      left:0;
+      bottom:0;
+      width:0%;
+      height:3px;
+      background-color:#7BE3C6; /* mint from your reference */
+      border-radius:999px;
+      transition: width .25s ease-in-out;
+    }
+    .nav-link:hover::after{
+      width:100%;
+    }
+  </style>
+
+
+  <style>
+    /* Social icon hover ring (mint) */
+    .social-btn{
+      border:2px solid transparent;
+      transition: border-color .25s ease, transform .2s ease;
+      border-radius:9999px;
+    }
+    .social-btn:hover{
+      border-color:#7BE3C6;
+      transform: translateY(-1px);
+    }
+  </style>
+
+</head>
+
+<body class="bg-white text-slate-800 font-sans antialiased">
+
+  <div class="grain overflow-hidden relative">
+    <div class="absolute inset-0 -z-10">
+      <div class="absolute -top-36 -left-40 h-[520px] w-[520px] rounded-full blur-3xl opacity-30"
+        style="background: radial-gradient(circle at 35% 35%, #B6ECFF, transparent 60%);"></div>
+      <div class="absolute -top-44 right-[-180px] h-[650px] w-[650px] rounded-full blur-3xl opacity-25"
+        style="background: radial-gradient(circle at 35% 35%, #7BE0C3, transparent 60%);"></div>
+      <div class="absolute top-40 left-[45%] h-[520px] w-[520px] rounded-full blur-3xl opacity-18"
+        style="background: radial-gradient(circle at 35% 35%, #C9C5FF, transparent 60%);"></div>
+    </div>
+
+    <!-- NAV -->
+    <header class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+      <nav class="flex items-center justify-between">
+        <div class="hidden md:flex items-center gap-7 text-sm text-slate-700">
+          <a class="hover:text-plum transition nav-link" href="#home">Home</a>
+          <a class="hover:text-plum transition nav-link" href="./about.html">About</a>
+          <a class="hover:text-plum transition nav-link" href="./howitworks.html">How It Works</a>
+          <a class="hover:text-plum transition nav-link" href="#contact">Contact</a>
+        </div>
+
+        <div class="absolute left-1/2 -translate-x-1/2 font-display font-extrabold text-plum tracking-tight text-xl sm:text-2xl">
+          <a href="#"><img src="./logo.png" alt="" width="100px"></a>
+        </div>
+
+
+        <div class="flex items-center gap-2">
+          
+          <button id="authBtn" class="hidden md:inline-flex items-center justify-center rounded-xl bg-plum px-4 py-2 text-[11px] font-semibold tracking-wide text-white shadow-glow hover:-translate-y-[1px] transition">Sign up / Log in</button>
+          <button class="hidden md:grid h-9 w-9 place-items-center rounded-full border border-slate-200 bg-white/70 backdrop-blur hover:bg-white transition">f</button>
+          <button class="hidden md:grid h-9 w-9 place-items-center rounded-full border border-slate-200 bg-white/70 backdrop-blur hover:bg-white transition">in</button>
+          <button class="hidden md:grid h-9 w-9 place-items-center rounded-full border border-slate-200 bg-white/70 backdrop-blur hover:bg-white transition">X</button>
+
+          <button id="menuBtn" class="md:hidden rounded-xl border border-slate-200 px-3 py-2 bg-white/80 backdrop-blur">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path d="M4 7h16M4 12h16M4 17h16" stroke="#2B1E4A" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+      </nav>
+
+      <div id="mobileMenu" class="md:hidden hidden mt-4">
+        <div class="rounded-2xl border border-slate-200 bg-white/80 backdrop-blur p-4 shadow-card">
+                    <button id="authBtnMobile" class="mb-3 w-full inline-flex items-center justify-center rounded-xl bg-plum px-4 py-3 text-[11px] font-semibold tracking-wide text-white shadow-glow hover:-translate-y-[1px] transition">Sign up / Log in</button>
+<div class="grid gap-3 text-sm font-medium">
+            <a href="#home" class="hover:text-plum">Home</a>
+            <a href="./about.html" class="hover:text-plum">About</a>
+            <a href="./howitworks.html" class="hover:text-plum">How It Works</a>
+            <a href="#contact" class="hover:text-plum">Contact</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section id="home"
+      class="min-h-[90vh] flex items-center
+             max-w-6xl mx-auto px-4 sm:px-6 lg:px-8
+             pt-16 pb-20 sm:pt-20 sm:pb-24 lg:pt-28 lg:pb-32">
+
+      <div class="grid lg:grid-cols-2 gap-14 lg:gap-20 items-center">
+
+        <div class="reveal">
+          <h1 class="font-display text-[56px] sm:text-[72px] leading-[1.02] font-extrabold text-ink">
+            Connecting<br>
+            <span class="font-sans font-medium text-plum text-[46px] sm:text-[54px]">Startups with</span><br>
+            <span class="brush">Investors</span>
+          </h1>
+
+          <p class="mt-8 max-w-xl text-slate-600 text-[14px] leading-7">
+            Foundora helps founders meet the right investors faster. Build a strong startup profile, discover
+            verified investors, start conversations, schedule meetings, and track funding progress—all in one place.
+          </p>
+
+          <button id="joinFoundoraBtn" type="button"
+            class="mt-10 inline-flex items-center justify-center rounded-xl bg-plum px-8 py-4
+                   text-xs font-semibold tracking-wide text-white shadow-glow hover:-translate-y-1 transition">
+            JOIN FOUNDORA
+          </button>
+        </div>
+
+        <!-- Right hero blob -->
+        <div class="reveal relative flex justify-center lg:justify-end">
+          <div class="relative w-[460px] max-w-full">
+
+            <!-- Mint blob behind -->
+            <div class="absolute -right-6 top-12 w-64 h-64 blob bg-mint opacity-90 shadow-card float-slow"></div>
+
+            <!-- dotted arc -->
+            <div class="absolute right-10 top-28 w-80 h-80 dash-circle float-mid"></div>
+
+            <!-- image -->
+            <div class="relative blob overflow-hidden bg-white shadow-soft">
+              <div class="absolute inset-0 blob border-[10px] border-plum pointer-events-none"></div>
+              <img
+                src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1600&q=80"
+                alt="Foundora Community"
+                class="w-full h-[360px] sm:h-[390px] object-cover"
+              />
+            </div>
+
+            <!-- lavender accent -->
+            <div class="absolute -left-12 top-36 w-24 h-14 blob2 bg-lavender opacity-80 shadow-card float-rot"></div>
+
+            <!-- small soft circle -->
+            <div class="absolute right-16 -top-8 h-12 w-12 rounded-full bg-cyanSoft shadow-card float-slow"></div>
+
+            <!-- tiny dots -->
+            <div class="absolute -left-7 top-56 flex gap-2 opacity-60">
+              <span class="w-2 h-2 rounded-full bg-plum/40"></span>
+              <span class="w-2 h-2 rounded-full bg-plum/40"></span>
+              <span class="w-2 h-2 rounded-full bg-plum/25"></span>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </div>
+
+  <!-- WHAT WE DO (with slider) + ABOUT (same section) -->
+  <section id="services" class="relative">
+    <div class="bg-softBlue curveWrap">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-12">
+
+        <div class="text-center reveal">
+          <h2 class="font-display text-3xl font-extrabold text-ink">How Foundora Works</h2>
+          <p class="mt-1 text-lg text-plum">Connecting Ideas with <span class="brush">Capital</span></p>
+        </div>
+
+        <div class="mt-10 grid lg:grid-cols-2 gap-10 items-center">
+
+          <!-- slider -->
+          <div class="reveal">
+            <div class="relative">
+              <div id="svcTrack"
+                class="no-scrollbar flex gap-5 overflow-x-auto pr-4 pb-2 snap-x snap-mandatory scroll-smooth">
+
+                <div class="snap-start min-w-[250px] rounded-2xl bg-white/90 backdrop-blur border border-white shadow-card p-5 hover:-translate-y-1 hover:shadow-soft transition">
+                  <div class="h-11 w-11 rounded-xl bg-rose-50 grid place-items-center">🧾</div>
+                  <h3 class="mt-4 text-xs font-extrabold text-ink tracking-wide">CREATE YOUR PROFILE</h3>
+                  <p class="mt-2 text-[11px] leading-5 text-slate-600">
+                    Sign up as a startup or investor and build a clear profile that showcases goals, stage, and interests.
+                  </p>
+                </div>
+
+                <div class="snap-start min-w-[250px] rounded-2xl bg-white/90 backdrop-blur border border-white shadow-card p-5 hover:-translate-y-1 hover:shadow-soft transition">
+                  <div class="h-11 w-11 rounded-xl bg-cyanSoft/40 grid place-items-center">🔎</div>
+                  <h3 class="mt-4 text-xs font-extrabold text-ink tracking-wide">DISCOVER & CONNECT</h3>
+                  <p class="mt-2 text-[11px] leading-5 text-slate-600">
+                    Search and filter by industry, funding stage, location, and investment preferences to find the best match.
+                  </p>
+                </div>
+
+                <div class="snap-start min-w-[250px] rounded-2xl bg-white/90 backdrop-blur border border-white shadow-card p-5 hover:-translate-y-1 hover:shadow-soft transition">
+                  <div class="h-11 w-11 rounded-xl bg-lavender/40 grid place-items-center">💬</div>
+                  <h3 class="mt-4 text-xs font-extrabold text-ink tracking-wide">MESSAGE & MEET</h3>
+                  <p class="mt-2 text-[11px] leading-5 text-slate-600">
+                    Use secure messaging and schedule meetings to turn introductions into real conversations.
+                  </p>
+                </div>
+
+                <div class="snap-start min-w-[250px] rounded-2xl bg-white/90 backdrop-blur border border-white shadow-card p-5 hover:-translate-y-1 hover:shadow-soft transition">
+                  <div class="h-11 w-11 rounded-xl bg-mint/35 grid place-items-center">📈</div>
+                  <h3 class="mt-4 text-xs font-extrabold text-ink tracking-wide">TRACK FUNDING</h3>
+                  <p class="mt-2 text-[11px] leading-5 text-slate-600">
+                    Track investor interest, deal stages, and funding progress with simple, transparent updates.
+                  </p>
+                </div>
+
+              </div>
+
+              <div class="mt-4 flex items-center gap-2">
+                <button id="svcPrev"
+                  class="h-9 w-9 rounded-full border border-slate-200 bg-white/80 backdrop-blur shadow-card hover:bg-white transition">‹</button>
+                <button id="svcNext"
+                  class="h-9 w-9 rounded-full border border-slate-200 bg-white/80 backdrop-blur shadow-card hover:bg-white transition">›</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ABOUT -->
+          <div id="about" class="reveal relative">
+            <div class="relative flex justify-center lg:justify-end">
+              <div class="absolute -left-2 top-14 w-44 h-44 blob bg-mint opacity-85 shadow-card float-slow"></div>
+              <div class="absolute right-8 top-8 w-44 h-44 dash-circle float-mid"></div>
+
+              <div class="w-[350px] max-w-full blob overflow-hidden border-[10px] border-white shadow-soft bg-white">
+                <img
+                  src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1600&q=80"
+                  alt="Foundora Team"
+                  class="w-full h-[230px] object-cover"
+                />
+              </div>
+            </div>
+
+            <div class="mt-8 lg:mt-10">
+              <h3 class="font-display text-4xl font-extrabold text-ink leading-tight">
+                About Foundora<br>
+                <span class="font-sans font-medium text-3xl text-plum">Where Startups Meet <span class="brush">Investors</span></span>
+              </h3>
+
+              <p class="mt-4 text-slate-600 text-[13px] leading-6 max-w-xl">
+                Foundora is built to simplify fundraising for startups and make deal discovery easier for investors.
+                Create trusted profiles, connect through messaging, schedule meetings, and stay on top of every deal stage.
+              </p>
+
+              <a href="#work"
+                class="mt-6 inline-flex items-center justify-center rounded-xl bg-plum px-7 py-3 text-xs font-semibold tracking-wide text-white shadow-glow hover:-translate-y-1 transition">
+                LEARN MORE
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RECENT WORK -->
+  <section id="work" class="bg-white">
+    <div class="bg-rose-50/60">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+        <div class="grid lg:grid-cols-2 gap-6 items-start reveal">
+          <div>
+            <h2 class="font-display text-3xl sm:text-4xl font-extrabold text-ink">
+              Platform Capabilities<br>
+              <span class="font-sans font-medium text-plum">Built for <span class="brush">Founders & Investors</span></span>
+            </h2>
+          </div>
+          <p class="text-slate-600 text-[13px] leading-6 lg:pt-2">
+            Foundora provides tools to support both startups and investors—from discovery and messaging to meetings,
+            notifications, and a funding tracker (coming as the platform grows).
+          </p>
+        </div>
+
+        <div class="mt-10 grid md:grid-cols-3 gap-6 reveal">
+          <article class="group rounded-2xl bg-white border border-slate-100 shadow-card overflow-hidden hover:-translate-y-1 hover:shadow-soft transition">
+            <div class="h-44 bg-slate-50 overflow-hidden">
+              <img class="w-full h-full object-cover group-hover:scale-[1.04] transition duration-500"
+                src="https://images.unsplash.com/photo-1559028012-481c04fa702d?auto=format&fit=crop&w=1600&q=80" alt="">
+            </div>
+            <div class="p-5 flex items-end justify-between">
+              <h3 class="font-bold text-ink">Startup Profiles</h3>
+              <button class="text-[11px] font-semibold text-plum border border-slate-200 rounded-full px-3 py-1 hover:bg-slate-50">Learn More</button>
+            </div>
+          </article>
+
+          <article class="group rounded-2xl bg-white border border-slate-100 shadow-card overflow-hidden hover:-translate-y-1 hover:shadow-soft transition">
+            <div class="h-44 bg-slate-50 overflow-hidden">
+              <img class="w-full h-full object-cover group-hover:scale-[1.04] transition duration-500"
+                src="https://images.unsplash.com/photo-1522542550221-31fd19575a2d?auto=format&fit=crop&w=1600&q=80" alt="">
+            </div>
+            <div class="p-5 flex items-end justify-between">
+              <h3 class="font-bold text-ink">Investor Discovery</h3>
+              <button class="text-[11px] font-semibold text-plum border border-slate-200 rounded-full px-3 py-1 hover:bg-slate-50">Learn More</button>
+            </div>
+          </article>
+
+          <article class="group rounded-2xl bg-white border border-slate-100 shadow-card overflow-hidden hover:-translate-y-1 hover:shadow-soft transition">
+            <div class="h-44 bg-slate-50 overflow-hidden">
+              <img class="w-full h-full object-cover group-hover:scale-[1.04] transition duration-500"
+                src="https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=1600&q=80" alt="">
+            </div>
+            <div class="p-5 flex items-end justify-between">
+              <h3 class="font-bold text-ink">Smart Matching</h3>
+              <button class="text-[11px] font-semibold text-plum border border-slate-200 rounded-full px-3 py-1 hover:bg-slate-50">Learn More</button>
+            </div>
+          </article>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="bg-white" id="testimonials">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+      <div class="text-center reveal">
+        <h2 class="font-display text-3xl sm:text-4xl font-extrabold text-ink">Trusted by Founders & Investors</h2>
+        <p class="mt-1 text-lg text-plum">
+          What Early Users Say About <span class="brush">Foundora</span>
+        </p>
+      </div>
+
+      <div class="mt-10 reveal">
+        <div id="tWrap" class="t-wrap">
+          <div id="tStage" class="t-stage"></div>
+        </div>
+
+        <div id="tDots" class="mt-5 flex justify-center gap-2"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer id="contact" class="relative overflow-hidden mt-32">
+    <!-- Gradient background -->
+    <div class="absolute inset-0 -z-10 bg-gradient-to-br from-[#0E1B2C] via-[#1E2A4A] to-[#1B3A4B]"></div>
+
+    <!-- Soft glow accents -->
+    <div class="absolute -top-24 -left-24 h-72 w-72 rounded-full blur-3xl opacity-30 -z-10"
+        style="background: radial-gradient(circle at 30% 30%, #7BE0C3, transparent 60%);"></div>
+    <div class="absolute -bottom-32 -right-32 h-80 w-80 rounded-full blur-3xl opacity-25 -z-10"
+        style="background: radial-gradient(circle at 30% 30%, #B6ECFF, transparent 60%);"></div>
+
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-white">
+      <div class="grid lg:grid-cols-2 gap-12 items-start">
+
+        <!-- LEFT SIDE -->
+        <div>
+          <h3 class="font-display text-2xl font-extrabold tracking-tight">
+            <img src="./logo.png" alt="" width="100px">Foundora
+          </h3>
+
+          <p class="mt-4 text-white/70 text-sm leading-6 max-w-md">
+            Foundora is a next-generation platform connecting startups with investors—built to simplify fundraising,
+            improve deal discovery, and help great ideas get funded.
+          </p>
+
+          <div class="mt-6 flex items-center gap-3">
+            <a href="#" class="h-10 w-10 rounded-full bg-white/10 border border-white/15 backdrop-blur grid place-items-center hover:bg-white/20 transition">f</a>
+            <a href="#" class="h-10 w-10 rounded-full bg-white/10 border border-white/15 backdrop-blur grid place-items-center hover:bg-white/20 transition">in</a>
+            <a href="#" class="h-10 w-10 rounded-full bg-white/10 border border-white/15 backdrop-blur grid place-items-center hover:bg-white/20 transition">X</a>
+          </div>
+
+          <div class="mt-10 max-w-md">
+            <p class="text-sm font-semibold text-white">Newsletter</p>
+            <p class="mt-2 text-sm text-white/60">
+              Get updates about new startups, investors, and platform features.
+            </p>
+
+            <form id="newsletter" class="mt-4 flex gap-2">
+              <input
+                type="email"
+                required
+                placeholder="Enter your email"
+                class="flex-1 rounded-xl bg-white/10 border border-white/15 backdrop-blur
+                      px-4 py-3 text-sm text-white placeholder:text-white/45
+                      outline-none focus:ring-2 focus:ring-white/30"
+              />
+              <button
+                type="submit"
+                class="rounded-xl px-5 py-3 text-sm font-semibold text-[#0E1B2C]
+                      bg-gradient-to-r from-[#7BE0C3] to-[#B6ECFF]
+                      hover:opacity-90 transition shadow-card"
+              >Send
+              </button>
+            </form>
+
+            <p id="newsMsg" class="mt-2 text-xs text-white/55"></p>
+          </div>
+        </div>
+
+        <!-- RIGHT SIDE (MAP CARD) -->
+        <div class="rounded-3xl overflow-hidden bg-white/10 backdrop-blur border border-white/15 shadow-soft">
+          <div class="p-4 border-b border-white/10">
+            <p class="font-semibold text-white">Our Location</p>
+            <p class="text-sm text-white/60">Global • Remote-first</p>
+          </div>
+          <iframe
+            title="Map"
+            class="w-full h-[300px]"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            src="https://www.google.com/maps?q=New%20York%20USA&output=embed"
+          ></iframe>
+        </div>
+
+      </div>
+
+      <!-- BOTTOM BAR -->
+      <div class="mt-14 pt-6 border-t border-white/10
+                  flex flex-col sm:flex-row items-center justify-between
+                  gap-3 text-xs text-white/55">
+        <p>© <span id="year"></span> Foundora. All rights reserved.</p>
+        <div class="flex gap-4">
+          <a href="#" class="hover:text-white">Terms</a>
+          <a href="#" class="hover:text-white">Privacy</a>
+        </div>
+      </div>
+
+    </div>
+  </footer>
+
+<!-- AUTH MODAL -->
+  <div id="authModal" class="fixed inset-0 z-[60] hidden">
+    <div id="authBackdrop" class="absolute inset-0 bg-ink/50 backdrop-blur-sm"></div>
+
+    <div class="relative min-h-screen flex items-center justify-center p-4">
+      <div class="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl bg-white shadow-soft border border-slate-100">
+        <div class="flex items-center justify-between px-6 py-4 bg-mist border-b border-slate-100">
+          <div>
+            <p class="text-xs font-semibold text-plum">Foundora Account</p>
+            <h3 class="font-display text-xl font-extrabold text-ink leading-tight">
+              <span id="authTitle">Create your account</span>
+            </h3>
+          </div>
+
+          <button id="authClose" class="h-10 w-10 rounded-xl grid place-items-center hover:bg-white transition" aria-label="Close">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M6 6l12 12M18 6L6 18" stroke="#2B1E4A" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="p-6 sm:p-7">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="inline-flex rounded-2xl bg-slate-50 p-1 border border-slate-100">
+              <button type="button" id="modeSignup" class="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-plum transition">Sign up</button>
+              <button type="button" id="modeLogin" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-white transition">Log in</button>
+            </div>
+
+            <div id="roleToggle" class="inline-flex rounded-2xl bg-slate-50 p-1 border border-slate-100">
+              <button type="button" id="roleStartup" class="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-plum transition">Startup</button>
+              <button type="button" id="roleInvestor" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-white transition">Investor</button>
+            </div>
+          </div>
+
+          <div id="authMsg" class="mt-4 hidden rounded-2xl border px-4 py-3 text-[12px]"></div>
+
+          <form id="authForm" class="mt-6 grid gap-4" method="post" action="auth.php">
+            <input type="hidden" name="action" id="authAction" value="signup">
+            <input type="hidden" name="role" id="authRole" value="startup">
+
+            <!-- USER TABLE FIELDS -->
+            <div id="nameWrap" class="grid gap-2">
+              <span class="text-[11px] font-semibold text-slate-700">Name</span>
+              <input name="name" id="f_name" required
+                class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-plum/20"
+                placeholder="Your full name" />
+            </div>
+
+            <div class="grid sm:grid-cols-2 gap-4">
+              <label class="grid gap-2">
+                <span class="text-[11px] font-semibold text-slate-700">Email</span>
+                <input type="email" name="email" id="f_email" required
+                  class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-plum/20"
+                  placeholder="you@gmail.com" />
+              </label>
+
+              <label class="grid gap-2">
+                <span class="text-[11px] font-semibold text-slate-700">Password</span>
+                <input type="password" name="password" id="f_password" required minlength="8"
+                  class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-plum/20"
+                  placeholder="Minimum 8 characters" />
+              </label>
+            </div>
+
+            <div id="confirmWrap" class="grid gap-2">
+              <span class="text-[11px] font-semibold text-slate-700">Confirm password</span>
+              <input type="password" name="password_confirm" id="f_password_confirm" required minlength="8"
+                class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-plum/20"
+                placeholder="Re-type password" />
+            </div>
+
+            <!-- STARTUP_PROFILE TABLE FIELDS -->
+            <div id="startupFields" class="grid gap-4">
+              <div class="grid sm:grid-cols-2 gap-4">
+                <label class="grid gap-2">
+                  <span class="text-[11px] font-semibold text-slate-700">Startup name</span>
+                  <input name="startup_name" id="f_startup_name" required
+                    class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-plum/20"
+                    placeholder="Your startup name" />
+                </label>
+
+                <label class="grid gap-2">
+                  <span class="text-[11px] font-semibold text-slate-700">Founder name</span>
+                  <input name="founder_name" id="f_founder_name" required
+                    class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-plum/20"
+                    placeholder="Founder / CEO name" />
+                </label>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-4">
+                <label class="grid gap-2">
+                  <span class="text-[11px] font-semibold text-slate-700">Industry</span>
+                  <input name="industry" id="f_industry" required
+                    class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-plum/20"
+                    placeholder="Fintech, SaaS, Health..." />
+                </label>
+
+                <label class="grid gap-2">
+                  <span class="text-[11px] font-semibold text-slate-700">Stage</span>
+                  <select name="stage" id="f_stage" required
+                    class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-plum/20">
+                    <option value="">Select stage</option>
+                    <option>Idea</option>
+                    <option>MVP</option>
+                    <option>Pre-seed</option>
+                    <option>Seed</option>
+                    <option>Series A+</option>
+                  </select>
+                </label>
+              </div>
+
+              <label class="grid gap-2">
+                <span class="text-[11px] font-semibold text-slate-700">Description</span>
+                <textarea name="description" id="f_description" required rows="3"
+                  class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-plum/20"
+                  placeholder="Briefly describe your startup..."></textarea>
+              </label>
+
+              <label class="grid gap-2">
+                <span class="text-[11px] font-semibold text-slate-700">Funding needed</span>
+                <input type="number" min="0" step="1" name="funding_needed" id="f_funding_needed" required
+                  class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-plum/20"
+                  placeholder="e.g., 250000" />
+              </label>
+            </div>
+
+            <!-- INVESTOR_PROFILE TABLE FIELDS -->
+            <div id="investorFields" class="grid gap-4 hidden">
+              <div class="grid sm:grid-cols-2 gap-4">
+                <label class="grid gap-2">
+                  <span class="text-[11px] font-semibold text-slate-700">Investor name</span>
+                  <input name="investor_name" id="f_investor_name" required
+                    class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-plum/20"
+                    placeholder="Investor / firm name" />
+                </label>
+
+                <label class="grid gap-2">
+                  <span class="text-[11px] font-semibold text-slate-700">Investor type</span>
+                  <select name="investor_type" id="f_investor_type" required
+                    class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-plum/20">
+                    <option value="">Select type</option>
+                    <option>Angel</option>
+                    <option>VC</option>
+                    <option>Corporate</option>
+                    <option>Accelerator</option>
+                    <option>Syndicate</option>
+                  </select>
+                </label>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-4">
+                <label class="grid gap-2">
+                  <span class="text-[11px] font-semibold text-slate-700">Investor range</span>
+                  <input name="investor_range" id="f_investor_range" required
+                    class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-plum/20"
+                    placeholder="e.g., $10k – $50k" />
+                </label>
+
+                <label class="grid gap-2">
+                  <span class="text-[11px] font-semibold text-slate-700">Sector of interest</span>
+                  <input name="sector_of_interest" id="f_sector_of_interest" required
+                    class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-plum/20"
+                    placeholder="Fintech, SaaS..." />
+                </label>
+              </div>
+            </div>
+
+            <div class="mt-2 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+              <button type="submit"
+                class="inline-flex items-center justify-center rounded-2xl bg-plum px-6 py-3 text-sm font-semibold text-white shadow-glow hover:-translate-y-[1px] transition">
+                <span id="submitText">Create account</span>
+              </button>
+
+              <p class="text-[11px] text-slate-500 leading-5">
+                By continuing you agree to our
+                <a href="#" class="text-plum font-semibold hover:underline">Terms</a>
+                and
+                <a href="#" class="text-plum font-semibold hover:underline">Privacy</a>.
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+  // Mobile menu
+  const menuBtn = document.getElementById("menuBtn");
+  const mobileMenu = document.getElementById("mobileMenu");
+  menuBtn?.addEventListener("click", () => mobileMenu.classList.toggle("hidden"));
+
+  // Reveal on scroll
+  const io = new IntersectionObserver(
+    (entries) => entries.forEach(e => e.isIntersecting && e.target.classList.add("show")),
+    { threshold: 0.14 }
+  );
+  document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+
+  // Services slider arrows
+  const track = document.getElementById("svcTrack");
+  const prev = document.getElementById("svcPrev");
+  const next = document.getElementById("svcNext");
+  const step = () => {
+    const card = track?.querySelector("div");
+    return (card?.getBoundingClientRect().width || 250) + 20;
+  };
+  prev?.addEventListener("click", () => track?.scrollBy({ left: -step(), behavior: "smooth" }));
+  next?.addEventListener("click", () => track?.scrollBy({ left: step(), behavior: "smooth" }));
+
+  // Newsletter demo
+  const newsletter = document.getElementById("newsletter");
+  const newsMsg = document.getElementById("newsMsg");
+  newsletter?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (newsMsg) newsMsg.textContent = "Thanks for joining Foundora!";
+    newsletter.reset();
+  });
+
+  // Testimonials auto-swap
+  const testimonials = [
+    {
+      text: `Foundora helped us connect with investors who genuinely understood our vision.
+             It made fundraising simpler, faster, and more transparent.`,
+      who: "— Startup Founder",
+    },
+    {
+      text: `As an investor, Foundora saves time by showing startups that match my interests.
+             It’s an efficient way to discover great opportunities.`,
+      who: "— Angel Investor",
+    },
+  ];
+
+  const stage = document.getElementById("tStage");
+  const dotsWrap = document.getElementById("tDots");
+  let tIndex = 0;
+  let tTimer = null;
+
+  function makeCard(item){
+    const el = document.createElement("div");
+    el.className = "t-card";
+    el.innerHTML = `
+      <div class="text-mint text-5xl leading-none -mt-1">”</div>
+      <p class="mt-4 text-slate-700 text-[12px] leading-6">${item.text}</p>
+      <p class="mt-4 text-sm font-semibold text-ink">${item.who}</p>
+    `;
+    return el;
+  }
+
+  function renderDots(){
+    if (!dotsWrap) return;
+    dotsWrap.innerHTML = "";
+    testimonials.forEach((_, i) => {
+      const d = document.createElement("button");
+      d.type = "button";
+      d.className = "t-dot" + (i === tIndex ? " active" : "");
+      d.addEventListener("click", () => goTo(i, true));
+      dotsWrap.appendChild(d);
+    });
+  }
+
+  function goTo(nextIndex, restartTimer=false){
+    if (!stage) return;
+
+    const current = stage.querySelector(".t-card");
+    const next = makeCard(testimonials[nextIndex]);
+
+    next.classList.add("t-enter");
+    stage.appendChild(next);
+
+    requestAnimationFrame(() => {
+      next.classList.add("t-enter-active");
+      next.classList.remove("t-enter");
+    });
+
+    if (current){
+      current.classList.add("t-exit");
+      requestAnimationFrame(() => {
+        current.classList.add("t-exit-active");
+        current.classList.remove("t-exit");
+      });
+      setTimeout(() => current.remove(), 700);
+    }
+
+    tIndex = nextIndex;
+    renderDots();
+
+    if (restartTimer && tTimer){
+      clearInterval(tTimer);
+      startAutoSwap();
+    }
+  }
+
+  function startAutoSwap(){
+    if (!stage?.querySelector(".t-card")) goTo(0);
+    tTimer = setInterval(() => {
+      const next = (tIndex + 1) % testimonials.length;
+      goTo(next);
+    }, 4000);
+  }
+
+  if (stage) startAutoSwap();
+
+  // Year (only once)
+  const y = document.getElementById("year");
+  if (y) y.textContent = new Date().getFullYear();
+</script>
+
+
+<script>
+  // Landing page quick nav: if logged in, Sign up / Log in becomes Dashboard
+  (function(){
+    const getUser = () => { try { return JSON.parse(localStorage.getItem("foundora_user")||"null"); } catch { return null; } };
+    const user = getUser();
+
+    const authBtn = document.getElementById("authBtn");
+    const authBtnMobile = document.getElementById("authBtnMobile");
+    const join = document.getElementById("joinFoundoraBtn");
+
+    if (user) {
+      if (authBtn) authBtn.textContent = "Dashboard";
+      if (authBtnMobile) authBtnMobile.textContent = "Dashboard";
+      const goDash = () => window.location.href = "./dashboard.php";
+      authBtn?.addEventListener("click", (e)=>{ e.preventDefault(); goDash(); });
+      authBtnMobile?.addEventListener("click", (e)=>{ e.preventDefault(); goDash(); });
+      join?.addEventListener("click", (e)=>{ e.preventDefault(); goDash(); });
+    }
+  })();
+</script>
+
+<script src="auth.js?v=2"></script>
+</body>
+</html>

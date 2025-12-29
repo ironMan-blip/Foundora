@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About - Foundora</title>
+  <link rel="shortcut icon" href="./favicon-32.png" type="image/x-icon">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ink: "#1B1532",
+            plum: "#2B1E4A",
+            softBlue: "#EAF4FF",
+            mist: "#F6FAFF",
+            mint: "#7BE0C3",
+            cyanSoft: "#B6ECFF",
+            lavender: "#C9C5FF",
+            peach: "#FFD5C8",
+          },
+          fontFamily: {
+            display: ["Poppins", "ui-sans-serif", "system-ui"],
+            sans: ["Inter", "ui-sans-serif", "system-ui"],
+          },
+          boxShadow: {
+            card: "0 14px 40px rgba(17, 12, 46, .10)",
+            soft: "0 22px 70px rgba(17, 12, 46, .14)",
+            glow: "0 18px 60px rgba(123,224,195,.32)",
+          },
+        },
+      },
+    };
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    html { scroll-behavior: smooth; }
+    .grain { position: relative; }
+    .grain::before{
+      content:"";
+      position:absolute; inset:0;
+      pointer-events:none;
+      opacity:.06;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+      mix-blend-mode:multiply;
+    }
+    .brush { position: relative; display: inline-block; z-index: 0; }
+    .brush::after {
+      content:"";
+      position:absolute;
+      left:-.06em; right:-.06em;
+      bottom:.08em;
+      height:.35em;
+      border-radius:999px;
+      background: linear-gradient(90deg, rgba(123,224,195,.95), rgba(182,236,255,.85));
+      z-index:-1;
+      transform: rotate(-1.2deg);
+    }
+    .reveal { opacity: 0; transform: translateY(14px); transition: 850ms ease; }
+    .reveal.show { opacity: 1; transform: translateY(0); }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .reveal { transition: none !important; transform: none !important; opacity: 1 !important; }
+    }
+  </style>
+</head>
+
+<body class="bg-white text-slate-800 font-sans antialiased">
+  <div class="grain overflow-hidden relative min-h-screen">
+    <header class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+      <nav class="flex items-center justify-between">
+        <div class="hidden md:flex items-center gap-7 text-sm text-slate-700">
+          <a class="hover:text-plum transition" href="./index.html#home">Home</a>
+          <a class="hover:text-plum transition font-semibold" href="./about.html">About</a>
+          <a class="hover:text-plum transition" href="./howitworks.html">How It Works</a>
+          <a class="hover:text-plum transition" href="./index.html#contact">Contact</a>
+        </div>
+
+        <div class="absolute left-1/2 -translate-x-1/2 font-display font-extrabold text-plum tracking-tight text-xl sm:text-2xl">
+          <a href="./index.html#home" class="inline-flex items-center gap-2">
+            <img src="./logo.png" alt="Foundora" width="100" />
+          </a>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <a href="./index.html#home" class="hidden md:inline-flex items-center justify-center rounded-xl bg-plum px-4 py-2 text-[11px] font-semibold tracking-wide text-white shadow-glow hover:-translate-y-[1px] transition">Get Started</a>
+          <button id="menuBtn" class="md:hidden rounded-xl border border-slate-200 px-3 py-2 bg-white/80 backdrop-blur">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path d="M4 7h16M4 12h16M4 17h16" stroke="#2B1E4A" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+      </nav>
+
+      <div id="mobileMenu" class="md:hidden hidden mt-4">
+        <div class="rounded-2xl border border-slate-200 bg-white/80 backdrop-blur p-4 shadow-card">
+          <div class="grid gap-3 text-sm font-medium">
+            <a href="./index.html#home" class="hover:text-plum">Home</a>
+            <a href="./about.html" class="hover:text-plum">About</a>
+            <a href="./howitworks.html" class="hover:text-plum">How It Works</a>
+            <a href="./index.html#contact" class="hover:text-plum">Contact</a>
+            <a href="./index.html#home" class="mt-2 inline-flex items-center justify-center rounded-xl bg-plum px-4 py-3 text-[11px] font-semibold tracking-wide text-white shadow-glow">Get Started</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-20">
+      <section class="grid lg:grid-cols-2 gap-10 items-center">
+        <div class="reveal">
+          <p class="inline-flex items-center gap-2 text-xs font-semibold tracking-wide text-plum bg-mist border border-slate-200 rounded-full px-3 py-1">
+            <span class="h-2 w-2 rounded-full bg-mint"></span>
+            About Foundora
+          </p>
+          <h1 class="mt-5 font-display text-[42px] sm:text-[54px] leading-[1.05] font-extrabold text-ink">
+            A calmer way to raise and invest
+          </h1>
+          <p class="mt-6 text-slate-600 leading-7 max-w-xl">
+            Foundora is a startup-investor matchmaking platform built around one simple idea: clarity wins.
+            We help founders present their story in a structured way, help investors discover opportunities that fit their thesis,
+            and keep both sides aligned with messages, meetings, and a simple funding pipeline.
+          </p>
+          <div class="mt-8 flex flex-wrap gap-3">
+            <div class="rounded-2xl border border-slate-200 bg-white/80 backdrop-blur px-4 py-3 shadow-card">
+              <div class="text-sm font-semibold text-ink">Founder-first</div>
+              <div class="text-xs text-slate-600 mt-1">Pitch with confidence, not chaos.</div>
+            </div>
+            <div class="rounded-2xl border border-slate-200 bg-white/80 backdrop-blur px-4 py-3 shadow-card">
+              <div class="text-sm font-semibold text-ink">Investor-ready</div>
+              <div class="text-xs text-slate-600 mt-1">Filter faster, decide faster.</div>
+            </div>
+            <div class="rounded-2xl border border-slate-200 bg-white/80 backdrop-blur px-4 py-3 shadow-card">
+              <div class="text-sm font-semibold text-ink">One workspace</div>
+              <div class="text-xs text-slate-600 mt-1">Messages, meetings, pipeline.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="reveal">
+          <div class="rounded-3xl border border-slate-200 bg-white/80 backdrop-blur shadow-soft p-6 sm:p-8">
+            <h2 class="font-display text-2xl font-extrabold text-ink">Why we exist</h2>
+            <p class="mt-4 text-slate-600 leading-7">
+              Fundraising is often noisy: scattered spreadsheets, mismatched intros, and unclear next steps.
+              Foundora brings structure without adding complexity.
+            </p>
+            <div class="mt-6 grid gap-4">
+              <div class="flex gap-3">
+                <div class="mt-1 h-9 w-9 rounded-2xl bg-softBlue border border-slate-200 grid place-items-center text-plum font-bold">1</div>
+                <div>
+                  <div class="font-semibold text-ink">Reduce friction</div>
+                  <div class="text-sm text-slate-600">Search by name, filter by ticket size, and keep conversations organized.</div>
+                </div>
+              </div>
+              <div class="flex gap-3">
+                <div class="mt-1 h-9 w-9 rounded-2xl bg-softBlue border border-slate-200 grid place-items-center text-plum font-bold">2</div>
+                <div>
+                  <div class="font-semibold text-ink">Stay aligned</div>
+                  <div class="text-sm text-slate-600">A funding tracker shows what stage you are in and what to do next.</div>
+                </div>
+              </div>
+              <div class="flex gap-3">
+                <div class="mt-1 h-9 w-9 rounded-2xl bg-softBlue border border-slate-200 grid place-items-center text-plum font-bold">3</div>
+                <div>
+                  <div class="font-semibold text-ink">Build trust</div>
+                  <div class="text-sm text-slate-600">Profiles that feel real, plus context that makes outreach respectful.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mt-16 grid lg:grid-cols-3 gap-6">
+        <div class="reveal rounded-3xl border border-slate-200 bg-white/80 backdrop-blur shadow-card p-6">
+          <h3 class="font-display text-xl font-extrabold text-ink">Our promise</h3>
+          <p class="mt-3 text-sm text-slate-600 leading-7">
+            No clutter. No fake complexity. Just the essentials founders and investors need:
+            a strong profile, discovery tools, messaging, meetings, and a pipeline to track progress.
+          </p>
+        </div>
+        <div class="reveal rounded-3xl border border-slate-200 bg-white/80 backdrop-blur shadow-card p-6">
+          <h3 class="font-display text-xl font-extrabold text-ink">What makes us different</h3>
+          <ul class="mt-3 text-sm text-slate-600 leading-7 space-y-2">
+            <li><span class="font-semibold text-ink">Two-sided search</span> AAA startups and investors can find each other by name.</li>
+            <li><span class="font-semibold text-ink">Signal over spam</span> AAA clean profiles, clear ranges, real next steps.</li>
+            <li><span class="font-semibold text-ink">Fundraising in one view</span> AAA track every relationship like a pipeline.</li>
+          </ul>
+        </div>
+        <div class="reveal rounded-3xl border border-slate-200 bg-white/80 backdrop-blur shadow-card p-6">
+          <h3 class="font-display text-xl font-extrabold text-ink">Who it is for</h3>
+          <p class="mt-3 text-sm text-slate-600 leading-7">
+            Early-stage founders raising pre-seed to seed, angels and VCs looking for quality deal flow,
+            and anyone who wants fundraising to be more transparent and less stressful.
+          </p>
+        </div>
+      </section>
+
+      <section class="mt-16 reveal">
+        <div class="rounded-3xl border border-slate-200 bg-gradient-to-br from-mist to-softBlue shadow-soft p-8 sm:p-10">
+          <h2 class="font-display text-3xl sm:text-4xl font-extrabold text-ink">
+            Built for momentum and trust
+          </h2>
+          <p class="mt-4 text-slate-600 leading-7 max-w-3xl">
+            Foundora is designed to feel welcoming for first-time founders and powerful for experienced investors.
+            Your profile is your pitch. Your inbox is your relationship. Your pipeline is your progress.
+          </p>
+          <div class="mt-7 flex flex-wrap gap-3">
+            <a href="./howitworks.html" class="inline-flex items-center justify-center rounded-xl bg-plum px-6 py-3 text-xs font-semibold tracking-wide text-white shadow-glow hover:-translate-y-1 transition">See how it works</a>
+            <a href="./index.html#home" class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white/80 backdrop-blur px-6 py-3 text-xs font-semibold tracking-wide text-plum hover:bg-white transition">Join Foundora</a>
+          </div>
+        </div>
+      </section>
+
+      <footer class="mt-16 text-center text-xs text-slate-500">
+        <p>&copy; <span id="yr"></span> Foundora. Connecting startups with investors.</p>
+      </footer>
+    </main>
+  </div>
+
+  <script src="./shared.js"></script>
+  <script>
+    try { Foundora.mountBubbles(); } catch(e) {}
+
+    const menuBtn = document.getElementById('menuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    menuBtn?.addEventListener('click', () => mobileMenu?.classList.toggle('hidden'));
+
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => e.isIntersecting && e.target.classList.add('show'));
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+    document.getElementById('yr').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

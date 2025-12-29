@@ -1,0 +1,19 @@
+Array
+(
+    [action] => login
+    [role] => startup
+    [name] => 
+    [email] => fmj@example.com
+    [password] => FMJfake123
+    [password_confirm] => 
+    [startup_name] => 
+    [founder_name] => 
+    [industry] => 
+    [stage] => 
+    [description] => 
+    [funding_needed] => 
+    [investor_name] => 
+    [investor_type] => 
+    [investor_range] => 
+    [sector_of_interest] => 
+)

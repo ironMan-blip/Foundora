@@ -1,0 +1,494 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Messages • Foundora</title>
+  <link rel="shortcut icon" href="./favicon-32.png" type="image/x-icon">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ink: "#1B1532",
+            plum: "#2B1E4A",
+            softBlue: "#EAF4FF",
+            mist: "#F6FAFF",
+            mint: "#7BE0C3",
+            cyanSoft: "#B6ECFF",
+            lavender: "#C9C5FF",
+            peach: "#FFD5C8",
+          },
+          fontFamily: {
+            display: ["Poppins", "ui-sans-serif", "system-ui"],
+            sans: ["Inter", "ui-sans-serif", "system-ui"],
+          },
+          boxShadow: {
+            card: "0 14px 40px rgba(17, 12, 46, .10)",
+            soft: "0 22px 70px rgba(17, 12, 46, .14)",
+            glow: "0 18px 60px rgba(123,224,195,.32)",
+          },
+        },
+      },
+    };
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    html { scroll-behavior: smooth; }
+    .grain { position: relative; }
+    .grain::before{
+      content:"";
+      position:absolute; inset:0;
+      pointer-events:none;
+      opacity:.06;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+      mix-blend-mode:multiply;
+    }
+
+    /* Floating motion (dashboard pages) */
+    @keyframes floatY { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-16px)} }
+    @keyframes floatX { 0%,100%{transform:translateX(0)} 50%{transform:translateX(12px)} }
+    @keyframes floatR { 0%,100%{transform:rotate(0) translateY(0)} 50%{transform:rotate(2deg) translateY(-10px)} }
+    .float-slow { animation: floatY 8s ease-in-out infinite; }
+    .float-mid  { animation: floatX 10s ease-in-out infinite; }
+    .float-rot  { animation: floatR 12s ease-in-out infinite; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .motion-safe\:animate-none { animation: none !important; }
+      .float-slow,.float-mid,.float-rot { animation: none !important; }
+    }
+    .blob { border-radius: 62% 38% 55% 45% / 45% 55% 45% 55%; }
+    .blob2 { border-radius: 55% 45% 40% 60% / 55% 45% 55% 45%; }
+    .brush { position: relative; display: inline-block; z-index: 0; }
+    .brush::after {
+      content:"";
+      position:absolute;
+      left:-.06em; right:-.06em;
+      bottom:.08em;
+      height:.35em;
+      border-radius:999px;
+      background: linear-gradient(90deg, rgba(123,224,195,.95), rgba(182,236,255,.85));
+      z-index:-1;
+      transform: rotate(-1.2deg);
+      filter: saturate(1.05);
+    }
+    .dash-circle { border-radius: 9999px; border: 2px dashed rgba(43, 30, 74, 0.22); }
+    .reveal { opacity: 0; transform: translateY(14px); transition: 850ms ease; }
+    .reveal.show { opacity: 1; transform: translateY(0); }
+    .nav-link{ position: relative; padding-bottom: 6px; }
+    .nav-link::after{
+      content:""; position:absolute; left:0; bottom:0;
+      width:0%; height:3px; background-color:#7BE3C6; border-radius:999px;
+      transition: width .25s ease-in-out;
+    }
+    .nav-link:hover::after{ width:100%; }
+  </style>
+</head>
+<body class="bg-white text-slate-800 font-sans antialiased">
+
+  <div class="grain overflow-hidden relative min-h-screen">
+    <div class="absolute inset-0 -z-10">
+      <div class="absolute -top-36 -left-40 h-[520px] w-[520px] rounded-full blur-3xl opacity-30 float-slow"
+        style="background: radial-gradient(circle at 35% 35%, #B6ECFF, transparent 60%);"></div>
+      <div class="absolute -top-44 right-[-180px] h-[650px] w-[650px] rounded-full blur-3xl opacity-25 float-mid"
+        style="background: radial-gradient(circle at 35% 35%, #7BE0C3, transparent 60%);"></div>
+      <div class="absolute top-40 left-[45%] h-[520px] w-[520px] rounded-full blur-3xl opacity-18 float-rot"
+        style="background: radial-gradient(circle at 35% 35%, #C9C5FF, transparent 60%);"></div>
+    </div>
+
+    <!-- TOP NAV -->
+    <header class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+      <nav class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <a href="./index.html#home" class="inline-flex items-center gap-3">
+            <img src="./logo.png" alt="Foundora" class="h-8 w-auto" />
+            <span class="font-display font-extrabold text-plum tracking-tight text-lg hidden sm:inline">Foundora</span>
+          </a>
+        </div>
+
+        <div class="hidden md:flex items-center gap-7 text-sm text-slate-700">
+          <a class="hover:text-plum transition nav-link" href="./dashboard.html">Dashboard</a>
+          <a class="hover:text-plum transition nav-link" href="./search.html">Search</a>
+          <a class="hover:text-plum transition nav-link" href="./messages.html">Messages</a>
+          <a class="hover:text-plum transition nav-link" href="./meetings.html">Meetings</a>
+          <a class="hover:text-plum transition nav-link" href="./funding.html">Funding</a>
+          <a class="hover:text-plum transition nav-link" href="./notifications.html">Alerts</a>
+          <a class="hover:text-plum transition nav-link" href="./profile.html">Profile</a>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <div class="hidden sm:flex items-center gap-2 rounded-2xl border border-slate-200 bg-white/70 backdrop-blur px-3 py-2">
+            <div class="h-8 w-8 rounded-xl bg-plum text-white grid place-items-center text-xs font-bold" id="userBadge">FD</div>
+            <div class="leading-tight">
+              <p class="text-[11px] font-semibold text-ink" id="userName">Guest</p>
+              <p class="text-[10px] text-slate-500" id="userRole">—</p>
+            </div>
+          </div>
+
+          <a id="btnBackToLanding" href="./index.html#home"
+             class="hidden md:inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white/70 backdrop-blur px-4 py-2 text-[11px] font-semibold tracking-wide text-slate-700 hover:bg-white transition">
+            Landing
+          </a>
+
+          <button id="logoutBtn"
+            class="inline-flex items-center justify-center rounded-xl bg-plum px-4 py-2 text-[11px] font-semibold tracking-wide text-white shadow-glow hover:-translate-y-[1px] transition">
+            Logout
+          </button>
+
+          <button id="menuBtn" class="md:hidden rounded-xl border border-slate-200 px-3 py-2 bg-white/80 backdrop-blur" aria-label="Menu">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path d="M4 7h16M4 12h16M4 17h16" stroke="#2B1E4A" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+      </nav>
+
+      <div id="mobileMenu" class="md:hidden hidden mt-4">
+        <div class="rounded-2xl border border-slate-200 bg-white/80 backdrop-blur p-4 shadow-card">
+          <div class="grid gap-3 text-sm font-medium">
+            <a href="./dashboard.html" class="hover:text-plum">Dashboard</a>
+            <a href="./search.html" class="hover:text-plum">Search</a>
+            <a href="./messages.html" class="hover:text-plum">Messages</a>
+            <a href="./meetings.html" class="hover:text-plum">Meetings</a>
+            <a href="./funding.html" class="hover:text-plum">Funding</a>
+            <a href="./notifications.html" class="hover:text-plum">Alerts</a>
+            <a href="./profile.html" class="hover:text-plum">Profile</a></div>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16">
+
+<div class="reveal">
+  <div class="rounded-3xl bg-white/80 backdrop-blur border border-slate-100 shadow-soft p-7">
+    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+      <div>
+        <h1 class="font-display text-3xl sm:text-4xl font-extrabold text-ink leading-tight">Messaging <span class="brush">System</span></h1>
+        <p class="mt-2 text-slate-600 text-sm leading-6 max-w-2xl">Secure, simple conversations with a clean two-pane layout.</p>
+      </div>
+      <a href="./search.html" class="inline-flex items-center justify-center rounded-2xl bg-plum px-6 py-3 text-xs font-semibold tracking-wide text-white shadow-glow hover:-translate-y-[1px] transition">New Message</a>
+    </div>
+
+    <div class="mt-6 grid lg:grid-cols-3 gap-4">
+      <aside class="lg:col-span-1 rounded-3xl border border-slate-100 bg-mist shadow-card overflow-hidden">
+        <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+          <p class="text-xs font-extrabold text-ink">Conversations</p>
+          <span class="text-[10px] font-semibold text-slate-500" id="convMeta">—</span>
+        </div>
+        <div id="convList" class="max-h-[520px] overflow-auto"></div>
+      </aside>
+
+      <section class="lg:col-span-2 rounded-3xl border border-slate-100 bg-white/70 backdrop-blur shadow-card overflow-hidden">
+        <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+          <div>
+            <p class="text-xs font-extrabold text-ink" id="chatWith">Select a conversation</p>
+            <p class="text-[10px] text-slate-500" id="chatHint">—</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <button id="deleteChatBtn" type="button" class="text-xs font-semibold text-slate-500 hover:text-rose-600 transition">Delete chat</button>
+            <a href="./meetings.html" class="text-xs font-semibold text-plum hover:underline">Schedule meeting →</a>
+          </div>
+        </div>
+
+        <div id="chatBody" class="p-5 max-h-[420px] overflow-auto space-y-3 bg-gradient-to-b from-white to-mist"></div>
+
+        <form id="chatForm" class="relative p-4 border-t border-slate-100 bg-white/70 backdrop-blur flex gap-2 items-end">
+          <button id="emojiBtn" type="button"
+            class="h-[46px] w-[46px] rounded-2xl border border-slate-200 bg-white/80 backdrop-blur grid place-items-center text-lg hover:bg-white transition"
+            aria-label="Emoji">
+            😊
+          </button>
+
+          <!-- Emoji picker (Instagram-like quick grid) -->
+          <div id="emojiPicker"
+            class="hidden absolute bottom-[76px] left-4 w-[280px] rounded-3xl border border-slate-200 bg-white/90 backdrop-blur shadow-soft p-3">
+            <div class="flex items-center justify-between px-2">
+              <p class="text-[11px] font-extrabold text-ink">Emojis</p>
+              <button id="emojiClose" type="button" class="text-[11px] font-semibold text-slate-500 hover:text-plum">Close</button>
+            </div>
+            <div id="emojiGrid" class="mt-2 grid grid-cols-8 gap-1.5"></div>
+            <p class="mt-2 px-2 text-[10px] text-slate-500">Tip: click to insert</p>
+          </div>
+
+          <input id="chatInput" placeholder="Write a message..." class="flex-1 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-plum/20" />
+          <button class="rounded-2xl bg-plum px-5 py-3 text-sm font-semibold text-white shadow-glow hover:-translate-y-[1px] transition">Send</button>
+        </form>
+      </section>
+    </div>
+  </div>
+</div>
+
+    </main>
+
+    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">
+      <div class="rounded-3xl border border-slate-100 bg-white/80 backdrop-blur shadow-card p-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <p class="text-xs text-slate-500">© <span id="year"></span> Foundora • Built for founders & investors</p>
+        <div class="flex gap-4 text-xs">
+          <a href="./index.html#contact" class="text-plum font-semibold hover:underline">Support</a>
+          <a href="./index.html#about" class="text-plum font-semibold hover:underline">About</a>
+          <a href="./index.html#services" class="text-plum font-semibold hover:underline">How it works</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="./shared.js"></script>
+  <script>
+    // Mobile menu
+    const menuBtn = document.getElementById("menuBtn");
+    const mobileMenu = document.getElementById("mobileMenu");
+    menuBtn?.addEventListener("click", () => mobileMenu.classList.toggle("hidden"));
+
+    // Reveal
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach(e => e.isIntersecting && e.target.classList.add("show")),
+      { threshold: 0.14 }
+    );
+    document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+
+    // Year
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+
+    // Auth guard + top bar
+    Foundora.requireAuth();
+    Foundora.mountTopBar();
+
+        Foundora.mountBubbles();
+const list = document.getElementById("convList");
+    const meta = document.getElementById("convMeta");
+    const chatWith = document.getElementById("chatWith");
+    const chatHint = document.getElementById("chatHint");
+    const chatBody = document.getElementById("chatBody");
+    const chatForm = document.getElementById("chatForm");
+    const deleteChatBtn = document.getElementById("deleteChatBtn");
+    const chatInput = document.getElementById("chatInput");
+
+    // Emoji picker
+    const emojiBtn = document.getElementById("emojiBtn");
+    const emojiPicker = document.getElementById("emojiPicker");
+    const emojiGrid = document.getElementById("emojiGrid");
+    const emojiClose = document.getElementById("emojiClose");
+
+    const EMOJIS = [
+      "😀","😄","😁","😅","😂","🥲","😊","😍",
+      "😎","🤩","😘","😴","😤","😭","😡","🤯",
+      "👍","🙏","👏","💪","🔥","✨","🎉","❤️",
+      "💛","💚","💙","💜","🩷","🫶","💯","🚀",
+      "🧠","📈","📊","📎","📝","📌","💼","🤝",
+      "🕒","📅","☎️","📩","📣","🎯","✅","⚡",
+    ];
+
+    const openPicker = () => {
+      if (!emojiPicker) return;
+      emojiPicker.classList.remove("hidden");
+      emojiPicker.classList.add("animate-[fadeIn_.18s_ease-out]");
+    };
+    const closePicker = () => {
+      if (!emojiPicker) return;
+      emojiPicker.classList.add("hidden");
+    };
+
+    if (emojiGrid) {
+      emojiGrid.innerHTML = EMOJIS.map(e =>
+        `<button type="button" class="h-8 w-8 rounded-xl hover:bg-mist transition grid place-items-center text-lg" data-emoji="${e}">${e}</button>`
+      ).join("");
+    }
+
+    emojiBtn?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (emojiPicker?.classList.contains("hidden")) openPicker(); else closePicker();
+    });
+    emojiClose?.addEventListener("click", closePicker);
+    document.addEventListener("click", (e) => {
+      if (!emojiPicker || emojiPicker.classList.contains("hidden")) return;
+      const t = e.target;
+      if (emojiPicker.contains(t) || emojiBtn?.contains(t)) return;
+      closePicker();
+    });
+
+    emojiGrid?.addEventListener("click", (e) => {
+      const btn = e.target?.closest?.("[data-emoji]");
+      if (!btn) return;
+      const em = btn.getAttribute("data-emoji") || "";
+      chatInput.value = (chatInput.value || "") + em;
+      chatInput.focus();
+    });
+
+    const apiGet = async (params) => {
+      const qs = new URLSearchParams(params);
+      const r = await fetch("./messages_api.php?" + qs.toString(), { credentials: "same-origin" });
+      return r.json();
+    };
+
+    const apiPost = async (bodyObj) => {
+      const body = new URLSearchParams(bodyObj);
+      const r = await fetch("./messages_api.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body,
+        credentials: "same-origin"
+      });
+      return r.json();
+    };
+
+    // Load conversations from DB
+    let convs = [];
+    let activeWithId = null;
+
+    const url = new URL(window.location.href);
+    const qsWith = parseInt(url.searchParams.get("with") || "0", 10);
+    const qsName = url.searchParams.get("name") || "";
+
+    const renderList = () => {
+      list.innerHTML = "";
+      convs.forEach(c => {
+        const row = document.createElement("button");
+        row.type = "button";
+        row.className = "w-full text-left px-4 py-4 border-b border-slate-100 hover:bg-white/70 transition flex items-start justify-between gap-3";
+        row.innerHTML = `
+          <div>
+            <p class="text-[12px] font-extrabold text-ink">${c.with}</p>
+            <p class="mt-1 text-[11px] text-slate-500 line-clamp-1">${c.last || ""}</p>
+            <p class="mt-2 text-[10px] text-slate-400">${Foundora.fmtTime(c.at)}</p>
+          </div>
+          <div class="shrink-0 flex flex-col items-end gap-2">
+            ${c.unread > 0 ? `<span class="h-6 min-w-[24px] px-2 rounded-full bg-ink text-white text-[11px] font-bold grid place-items-center">${c.unread}</span>` : `<span class="text-[10px] text-slate-400">✓</span>`}
+          </div>
+        `;
+        row.addEventListener("click", async () => {
+          activeWithId = c.other_id;
+          await openThread(activeWithId, c.with);
+          // unread is now cleared server-side, refresh list
+          await loadList(activeWithId);
+        });
+        if (c.other_id === activeWithId) row.classList.add("bg-white/70");
+        list.appendChild(row);
+      });
+    };
+
+    const bubble = (m) => {
+      const isMe = m.by === "me";
+      const wrap = document.createElement("div");
+      wrap.className = "flex " + (isMe ? "justify-end" : "justify-start");
+      const b = document.createElement("div");
+      b.className = "max-w-[78%] rounded-3xl px-4 py-3 shadow-card border border-slate-100 " + (isMe ? "bg-plum text-white" : "bg-white text-slate-800");
+      b.innerHTML = `
+        <p class="text-[12px] leading-5">${m.text}</p>
+        <p class="mt-2 text-[10px] ${isMe ? "text-white/70" : "text-slate-400"}">${Foundora.fmtTime(m.at)}</p>
+      `;
+      wrap.appendChild(b);
+      return wrap;
+    };
+
+    const renderEmpty = () => {
+      chatBody.innerHTML = "";
+      chatWith.textContent = "Select a conversation";
+      chatHint.textContent = "Pick a thread from the left panel.";
+    };
+
+    const openThread = async (otherId, nameHint = "") => {
+      if (!otherId) {
+        renderEmpty();
+        return;
+      }
+      activeWithId = otherId;
+
+      // Header
+      chatWith.textContent = nameHint || "Conversation";
+      chatHint.textContent = "Keep it clear, short, and value-driven.";
+
+      const j = await apiGet({ action: "thread", with: String(otherId) });
+      if (!j || !j.ok) {
+        renderEmpty();
+        return;
+      }
+
+      // Render messages
+      chatBody.innerHTML = "";
+      (j.messages || []).forEach(m => chatBody.appendChild(bubble(m)));
+      chatBody.scrollTop = chatBody.scrollHeight;
+    };
+
+    const loadList = async (preferId = null) => {
+      const j = await apiGet({ action: "list" });
+      if (!j || !j.ok) {
+        meta.textContent = "0 total";
+        convs = [];
+        renderList();
+        renderEmpty();
+        return;
+      }
+      convs = (j.conversations || []).slice().sort((a,b)=> new Date(b.at)-new Date(a.at));
+      meta.textContent = convs.length + " total";
+
+      // Decide active conversation
+      if (preferId) {
+        activeWithId = preferId;
+      } else if (qsWith > 0) {
+        activeWithId = qsWith;
+      } else {
+        // fallback to saved hint
+        try {
+          const stored = JSON.parse(localStorage.getItem("foundora_active_chat") || "null");
+          if (stored?.with_id) activeWithId = parseInt(stored.with_id, 10);
+        } catch(e) {}
+      }
+
+      if (!activeWithId && convs[0]) activeWithId = convs[0].other_id;
+
+      renderList();
+
+      const active = convs.find(c => c.other_id === activeWithId);
+      if (active) {
+        await openThread(activeWithId, active.with);
+      } else if (activeWithId && qsName) {
+        await openThread(activeWithId, qsName);
+      } else {
+        renderEmpty();
+      }
+    };
+
+    // Initial load
+    loadList();
+
+    chatForm?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      if (!activeWithId) {
+        alert("Select a conversation");
+        return;
+      }
+
+      const text = (chatInput.value || "").trim();
+      if (!text) return;
+
+      const j = await apiPost({ action: "send", to: String(activeWithId), content: text });
+      if (!j || !j.ok) {
+        alert("Send failed");
+        return;
+      }
+
+      chatInput.value = "";
+      await openThread(activeWithId);
+      await loadList(activeWithId);
+    });
+
+    deleteChatBtn?.addEventListener("click", () => {
+      alert("Delete chat is not implemented in backend version.");
+    });
+</script>
+</body>
+</html>

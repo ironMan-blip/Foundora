@@ -1,0 +1,709 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profile • Foundora</title>
+  <link rel="shortcut icon" href="./favicon-32.png" type="image/x-icon">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ink: "#1B1532",
+            plum: "#2B1E4A",
+            softBlue: "#EAF4FF",
+            mist: "#F6FAFF",
+            mint: "#7BE0C3",
+            cyanSoft: "#B6ECFF",
+            lavender: "#C9C5FF",
+            peach: "#FFD5C8",
+          },
+          fontFamily: {
+            display: ["Poppins", "ui-sans-serif", "system-ui"],
+            sans: ["Inter", "ui-sans-serif", "system-ui"],
+          },
+          boxShadow: {
+            card: "0 14px 40px rgba(17, 12, 46, .10)",
+            soft: "0 22px 70px rgba(17, 12, 46, .14)",
+            glow: "0 18px 60px rgba(123,224,195,.32)",
+          },
+        },
+      },
+    };
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    html { scroll-behavior: smooth; }
+    .grain { position: relative; }
+    .grain::before{
+      content:"";
+      position:absolute; inset:0;
+      pointer-events:none;
+      opacity:.06;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+      mix-blend-mode:multiply;
+    }
+
+    /* Floating motion (dashboard pages) */
+    @keyframes floatY { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-16px)} }
+    @keyframes floatX { 0%,100%{transform:translateX(0)} 50%{transform:translateX(12px)} }
+    @keyframes floatR { 0%,100%{transform:rotate(0) translateY(0)} 50%{transform:rotate(2deg) translateY(-10px)} }
+    .float-slow { animation: floatY 8s ease-in-out infinite; }
+    .float-mid  { animation: floatX 10s ease-in-out infinite; }
+    .float-rot  { animation: floatR 12s ease-in-out infinite; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .motion-safe\:animate-none { animation: none !important; }
+      .float-slow,.float-mid,.float-rot { animation: none !important; }
+    }
+    .blob { border-radius: 62% 38% 55% 45% / 45% 55% 45% 55%; }
+    .blob2 { border-radius: 55% 45% 40% 60% / 55% 45% 55% 45%; }
+    .brush { position: relative; display: inline-block; z-index: 0; }
+    .brush::after {
+      content:"";
+      position:absolute;
+      left:-.06em; right:-.06em;
+      bottom:.08em;
+      height:.35em;
+      border-radius:999px;
+      background: linear-gradient(90deg, rgba(123,224,195,.95), rgba(182,236,255,.85));
+      z-index:-1;
+      transform: rotate(-1.2deg);
+      filter: saturate(1.05);
+    }
+    .dash-circle { border-radius: 9999px; border: 2px dashed rgba(43, 30, 74, 0.22); }
+    .reveal { opacity: 0; transform: translateY(14px); transition: 850ms ease; }
+    .reveal.show { opacity: 1; transform: translateY(0); }
+    .nav-link{ position: relative; padding-bottom: 6px; }
+    .nav-link::after{
+      content:""; position:absolute; left:0; bottom:0;
+      width:0%; height:3px; background-color:#7BE3C6; border-radius:999px;
+      transition: width .25s ease-in-out;
+    }
+    .nav-link:hover::after{ width:100%; }
+  </style>
+</head>
+<body class="bg-white text-slate-800 font-sans antialiased">
+
+  <div class="grain overflow-hidden relative min-h-screen">
+    <div class="absolute inset-0 -z-10">
+      <div class="absolute -top-36 -left-40 h-[520px] w-[520px] rounded-full blur-3xl opacity-30 float-slow"
+        style="background: radial-gradient(circle at 35% 35%, #B6ECFF, transparent 60%);"></div>
+      <div class="absolute -top-44 right-[-180px] h-[650px] w-[650px] rounded-full blur-3xl opacity-25 float-mid"
+        style="background: radial-gradient(circle at 35% 35%, #7BE0C3, transparent 60%);"></div>
+      <div class="absolute top-40 left-[45%] h-[520px] w-[520px] rounded-full blur-3xl opacity-18 float-rot"
+        style="background: radial-gradient(circle at 35% 35%, #C9C5FF, transparent 60%);"></div>
+    </div>
+
+    <!-- TOP NAV -->
+    <header class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+      <nav class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <a href="./index.html#home" class="inline-flex items-center gap-3">
+            <img src="./logo.png" alt="Foundora" class="h-8 w-auto" />
+            <span class="font-display font-extrabold text-plum tracking-tight text-lg hidden sm:inline">Foundora</span>
+          </a>
+        </div>
+
+        <div class="hidden md:flex items-center gap-7 text-sm text-slate-700">
+          <a class="hover:text-plum transition nav-link" href="./dashboard.html">Dashboard</a>
+          <a class="hover:text-plum transition nav-link" href="./search.html">Search</a>
+          <a class="hover:text-plum transition nav-link" href="./messages.html">Messages</a>
+          <a class="hover:text-plum transition nav-link" href="./meetings.html">Meetings</a>
+          <a class="hover:text-plum transition nav-link" href="./funding.html">Funding</a>
+          <a class="hover:text-plum transition nav-link" href="./notifications.html">Alerts</a>
+          <a class="hover:text-plum transition nav-link" href="./profile.html">Profile</a>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <div class="hidden sm:flex items-center gap-2 rounded-2xl border border-slate-200 bg-white/70 backdrop-blur px-3 py-2">
+            <div class="h-8 w-8 rounded-xl bg-plum text-white grid place-items-center text-xs font-bold" id="userBadge">FD</div>
+            <div class="leading-tight">
+              <p class="text-[11px] font-semibold text-ink" id="userName">Guest</p>
+              <p class="text-[10px] text-slate-500" id="userRole">—</p>
+            </div>
+          </div>
+
+          <a id="btnBackToLanding" href="./index.html#home"
+             class="hidden md:inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white/70 backdrop-blur px-4 py-2 text-[11px] font-semibold tracking-wide text-slate-700 hover:bg-white transition">
+            Landing
+          </a>
+
+          <button id="logoutBtn"
+            class="inline-flex items-center justify-center rounded-xl bg-plum px-4 py-2 text-[11px] font-semibold tracking-wide text-white shadow-glow hover:-translate-y-[1px] transition">
+            Logout
+          </button>
+
+          <button id="menuBtn" class="md:hidden rounded-xl border border-slate-200 px-3 py-2 bg-white/80 backdrop-blur" aria-label="Menu">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path d="M4 7h16M4 12h16M4 17h16" stroke="#2B1E4A" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+      </nav>
+
+      <div id="mobileMenu" class="md:hidden hidden mt-4">
+        <div class="rounded-2xl border border-slate-200 bg-white/80 backdrop-blur p-4 shadow-card">
+          <div class="grid gap-3 text-sm font-medium">
+            <a href="./dashboard.html" class="hover:text-plum">Dashboard</a>
+            <a href="./search.html" class="hover:text-plum">Search</a>
+            <a href="./messages.html" class="hover:text-plum">Messages</a>
+            <a href="./meetings.html" class="hover:text-plum">Meetings</a>
+            <a href="./funding.html" class="hover:text-plum">Funding</a>
+            <a href="./notifications.html" class="hover:text-plum">Alerts</a>
+            <a href="./profile.html" class="hover:text-plum">Profile</a></div>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16">
+
+<div class="reveal">
+  <div class="rounded-3xl bg-white/80 backdrop-blur border border-slate-100 shadow-soft p-7 overflow-hidden relative">
+    <div class="absolute -top-10 -left-14 h-48 w-48 blob bg-mint opacity-50 blur-2xl"></div>
+    <div class="absolute -bottom-12 -right-16 h-56 w-56 blob2 bg-cyanSoft opacity-40 blur-2xl"></div>
+
+    <div class="relative">
+      <h1 class="font-display text-3xl sm:text-4xl font-extrabold text-ink leading-tight">Your <span class="brush">Profile</span></h1>
+      <p class="mt-2 text-slate-600 text-sm leading-6 max-w-2xl">Edit basic details.</p>
+
+      <div class="mt-6 grid lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-1">
+          <div class="rounded-3xl border border-slate-100 bg-mist shadow-card p-6">
+            <div class="flex items-center gap-3">
+              <div class="h-12 w-12 rounded-2xl bg-plum text-white grid place-items-center font-extrabold" id="pBadge">FD</div>
+              <div>
+                <p class="text-sm font-extrabold text-ink" id="pName">—</p>
+                <p class="text-[11px] text-slate-500" id="pRole">—</p>
+              </div>
+            </div>
+            <div class="mt-5 rounded-2xl bg-white/70 border border-slate-100 p-4">
+              <p class="text-[11px] font-semibold text-slate-600">Profile strength</p>
+              <div class="mt-3 h-3 rounded-full bg-slate-100 overflow-hidden">
+                <div id="pStrength" class="h-full bg-plum w-[60%] rounded-full"></div>
+              </div>
+              <p class="mt-2 text-[10px] text-slate-500">Fill more fields for better matches.</p>
+            </div>
+            <a href="./search.html" class="mt-5 inline-flex w-full items-center justify-center rounded-2xl bg-plum px-6 py-3 text-xs font-semibold tracking-wide text-white shadow-glow hover:-translate-y-[1px] transition">Find matches</a>
+          </div>
+        </div>
+
+        <div class="lg:col-span-2">
+
+          <div class="rounded-3xl border border-slate-100 bg-white/70 backdrop-blur shadow-card p-6 mb-6">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <p class="text-xs font-extrabold text-ink">Full profile</p>
+                <p class="mt-1 text-[11px] text-slate-500">Everything you’ve saved</p>
+              </div>
+              <button id="btnEditProfile" type="button" class="px-4 py-2 rounded-2xl text-xs font-semibold bg-plum text-white shadow-glow hover:-translate-y-[1px] transition">Edit</button>
+            </div>
+
+            <div class="mt-5 flex items-center gap-4">
+  <img id="profileAvatar" class="h-16 w-16 rounded-full object-cover ring-2 ring-lavender/60 bg-slate-100" alt="Profile picture"/>
+  <div class="min-w-0">
+    <p id="profileHeaderName" class="text-sm font-extrabold text-ink truncate">—</p>
+    <p id="profileHeaderMeta" class="text-[11px] text-slate-500 truncate">—</p>
+  </div>
+</div>
+
+<div id="fullProfile" class="mt-4 grid sm:grid-cols-2 gap-3"></div>
+          </div>
+
+          <!-- Edit modal (pops up over the page) -->
+          <div id="profileModal" class="fixed inset-0 z-50 hidden">
+            <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" data-modal-backdrop></div>
+            <div class="relative mx-auto w-full max-w-2xl px-4 sm:px-6 lg:px-8 h-full flex items-center justify-center">
+              <div class="w-full max-h-[90vh] rounded-3xl border border-slate-100 bg-white/90 backdrop-blur shadow-soft overflow-hidden flex flex-col">
+                <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                  <div>
+                    <p class="text-sm font-extrabold text-ink">Edit profile</p>
+                    
+                  </div>
+                  <button id="btnCloseProfile" type="button" class="h-10 w-10 rounded-2xl border border-slate-200 bg-white/70 hover:bg-white grid place-items-center transition" aria-label="Close">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                      <path d="M6 6l12 12M18 6L6 18" stroke="#2B1E4A" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </button>
+                </div>
+
+                <form id="profileForm" class="p-6 grid gap-4 overflow-y-auto">
+            
+            <div class="rounded-3xl border border-slate-100 bg-white/60 backdrop-blur p-4 flex items-center gap-4">
+              <img id="pfAvatarPreview" class="h-16 w-16 rounded-full object-cover ring-2 ring-lavender/60 bg-slate-100" alt="Preview"/>
+              <div class="grid gap-2 flex-1">
+                <p class="text-[11px] font-semibold text-slate-700">Profile picture</p>
+                <input id="pfAvatar" type="file" accept="image/*" class="block w-full text-sm file:mr-4 file:rounded-xl file:border-0 file:bg-plum file:px-4 file:py-2 file:text-white hover:file:opacity-90" />
+                <p class="text-[11px] text-slate-500">PNG/JPG up to a couple MB (stored locally).</p>
+              </div>
+            </div>
+            <div class="grid sm:grid-cols-2 gap-4">
+              <label class="grid gap-2">
+                <span class="text-[11px] font-semibold text-slate-700">Display name</span>
+                <input id="pfName" required class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-plum/20" name="display_name" />
+              </label>
+              <label class="grid gap-2">
+                <span class="text-[11px] font-semibold text-slate-700">Role</span>
+                <input id="pfRole" disabled class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none" />
+              </label>
+            </div>
+
+            <div id="startupBlock" class="grid gap-4">
+              <div class="grid sm:grid-cols-2 gap-4">
+                <label class="grid gap-2">
+                  <span class="text-[11px] font-semibold text-slate-700">Startup name</span>
+                  <input id="pfStartup" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-plum/20" placeholder="MintLoop" name="startup_name" />
+                </label>
+                <label class="grid gap-2">
+                  <span class="text-[11px] font-semibold text-slate-700">Stage</span>
+                  <select id="pfStage" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-plum/20" name="stage">
+                    <option>Idea</option><option>MVP</option><option>Pre-seed</option><option>Seed</option><option>Series A+</option>
+                  </select>
+                </label>
+              </div>
+              <div class="grid sm:grid-cols-2 gap-4">
+                <label class="grid gap-2">
+                  <span class="text-[11px] font-semibold text-slate-700">Founder name</span>
+                  <input id="pfFounder" class="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-plum/20" placeholder="Founder name" name="founder_name" />
+                </label>
+                <label class="grid gap-2">
+                  <span class="text-[11px] font-semibold text-slate-700">Industry</span>
+                  <input id="pfIndustry" class="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-plum/20" placeholder="Industry" name="industry" />
+                </label>
+              </div>
+              <label class="grid gap-2">
+                <span class="text-[11px] font-semibold text-slate-700">Description</span>
+                <input id="pfTagline" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-plum/20" placeholder="Describe your startup briefly" name="description" />
+              </label>
+              <label class="grid gap-2">
+                <span class="text-[11px] font-semibold text-slate-700">Funding needed</span>
+                <input id="pfNeed" type="number" min="0" step="1" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-plum/20" placeholder="250000" name="funding_needed" />
+              </label>
+            </div>
+
+            <div id="investorBlock" class="grid gap-4 hidden">
+              <div class="grid sm:grid-cols-2 gap-4">
+                <label class="grid gap-2">
+                  <span class="text-[11px] font-semibold text-slate-700">Investor name</span>
+                  <input id="pfFirm" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-plum/20" placeholder="Investor name" name="investor_name" />
+                </label>
+                <label class="grid gap-2">
+                  <span class="text-[11px] font-semibold text-slate-700">Investor range</span>
+                  <input id="pfTicket" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-plum/20" placeholder="e.g. $10k–$50k" name="investor_range" />
+                </label>
+              </div>
+              <label class="grid gap-2">
+                <span class="text-[11px] font-semibold text-slate-700">Investor type</span>
+                <input id="pfInvType" class="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-plum/20" placeholder="Angel, VC, etc." name="investor_type" />
+              </label>
+              <label class="grid gap-2">
+                <span class="text-[11px] font-semibold text-slate-700">Sector of interest</span>
+                <input id="pfFocus" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-plum/20" placeholder="SaaS, Fintech..." name="sector_of_interest" />
+              </label>
+            </div>
+
+            <div class="mt-2 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+              <button class="inline-flex items-center justify-center rounded-2xl bg-plum px-6 py-3 text-sm font-semibold text-white shadow-glow hover:-translate-y-[1px] transition">Save</button>
+              <p id="pfMsg" class="text-[11px] text-slate-500"></p>
+            </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    </main>
+
+    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">
+      <div class="rounded-3xl border border-slate-100 bg-white/80 backdrop-blur shadow-card p-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <p class="text-xs text-slate-500">© <span id="year"></span> Foundora • Built for founders & investors</p>
+        <div class="flex gap-4 text-xs">
+          <a href="./index.html#contact" class="text-plum font-semibold hover:underline">Support</a>
+          <a href="./index.html#about" class="text-plum font-semibold hover:underline">About</a>
+          <a href="./index.html#services" class="text-plum font-semibold hover:underline">How it works</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="./shared.js"></script>
+  <script>
+    // Mobile menu
+    const menuBtn = document.getElementById("menuBtn");
+    const mobileMenu = document.getElementById("mobileMenu");
+    menuBtn?.addEventListener("click", () => mobileMenu.classList.toggle("hidden"));
+
+    // Reveal
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach(e => e.isIntersecting && e.target.classList.add("show")),
+      { threshold: 0.14 }
+    );
+    document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+
+    // Year
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+
+    // Auth guard + top bar
+    Foundora.requireAuth();
+    Foundora.mountTopBar();
+
+        Foundora.mountBubbles();
+
+    const DEFAULT_AVATAR = "data:image/svg+xml;base64,CjxzdmcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyB3aWR0aD0nMTI4JyBoZWlnaHQ9JzEyOCcgdmlld0JveD0nMCAwIDEyOCAxMjgnPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSdnJyB4MT0nMCcgeTE9JzAnIHgyPScxJyB5Mj0nMSc+CjxzdG9wIG9mZnNldD0nMCcgc3RvcC1jb2xvcj0nI0I2RUNGRicvPjxzdG9wIG9mZnNldD0nMScgc3RvcC1jb2xvcj0nI0M5QzVGRicvPgo8L2xpbmVhckdyYWRpZW50Pgo8L2RlZnM+CjxyZWN0IHdpZHRoPScxMjgnIGhlaWdodD0nMTI4JyByeD0nMzInIGZpbGw9J3VybCgjZyknLz4KPGNpcmNsZSBjeD0nNjQnIGN5PSc1Micgcj0nMjInIGZpbGw9J3JnYmEoNDMsMzAsNzQsMC4xOCknLz4KPHBhdGggZD0nTTI2IDExMGM2LTIyIDIyLTM0IDM4LTM0czMyIDEyIDM4IDM0JyBmaWxsPSdyZ2JhKDQzLDMwLDc0LDAuMTgpJy8+Cjwvc3ZnPgo=";
+const u = Foundora.getUser();
+    const saved = Foundora.getMyProfile() || {};
+    const badge = document.getElementById("pBadge");
+    const pName = document.getElementById("pName");
+    const pRole = document.getElementById("pRole");
+    const strength = document.getElementById("pStrength");
+
+    const pfName = document.getElementById("pfName");
+    const pfRole = document.getElementById("pfRole");
+    const startupBlock = document.getElementById("startupBlock");
+    const investorBlock = document.getElementById("investorBlock");
+    const pfMsg = document.getElementById("pfMsg");
+
+    const initials = (u?.name || "Foundora").split(" ").filter(Boolean).slice(0,2).map(s=>s[0].toUpperCase()).join("");
+    badge.textContent = initials || "FD";
+    pName.textContent = u?.name || "User";
+    pRole.textContent = (u?.role || "startup").toUpperCase();
+    pfName.value = u?.name || "";
+    pfRole.value = u?.role || "startup";
+    // Load stored profile fields (front-end local storage)
+    if (saved.displayName) pfName.value = saved.displayName;
+    
+    // Startup fields
+    if (saved.startupName) document.getElementById("pfStartup").value = saved.startupName;
+    if (saved.stage) document.getElementById("pfStage").value = saved.stage;
+    if (saved.tagline) document.getElementById("pfTagline").value = saved.tagline;
+    if (saved.fundingNeeded != null) document.getElementById("pfNeed").value = saved.fundingNeeded;
+    if (saved.founderName) document.getElementById("pfFounder").value = saved.founderName;
+    if (saved.industry) document.getElementById("pfIndustry").value = saved.industry;
+
+    // Investor fields
+    if (saved.firm) document.getElementById("pfFirm").value = saved.firm;
+    if (saved.ticket) document.getElementById("pfTicket").value = saved.ticket;
+    if (saved.focus) document.getElementById("pfFocus").value = saved.focus;
+    if (saved.investorType) document.getElementById("pfInvType").value = saved.investorType;
+
+
+        const modal = document.getElementById("profileModal");
+    const form = document.getElementById("profileForm");
+    const fullProfile = document.getElementById("fullProfile");
+    const btnEditProfile = document.getElementById("btnEditProfile");
+    const btnCloseProfile = document.getElementById("btnCloseProfile");
+    const backdrop = modal?.querySelector("[data-modal-backdrop]");
+
+    
+
+const profileAvatar = document.getElementById("profileAvatar");
+const profileHeaderName = document.getElementById("profileHeaderName");
+const profileHeaderMeta = document.getElementById("profileHeaderMeta");
+const pfAvatar = document.getElementById("pfAvatar");
+const pfAvatarPreview = document.getElementById("pfAvatarPreview");
+const setEditMode = (on) => {
+      // Modal open/close
+      modal?.classList.toggle("hidden", !on);
+      document.documentElement.classList.toggle("overflow-hidden", !!on);
+      if (on) {
+        // focus first field
+        setTimeout(() => pfName?.focus(), 0);
+      }
+    };
+
+    
+
+const readFileAsDataURL = (file) => new Promise((resolve, reject) => {
+  const r = new FileReader();
+  r.onload = () => resolve(String(r.result || ""));
+  r.onerror = reject;
+  r.readAsDataURL(file);
+});
+
+pfAvatar?.addEventListener("change", async () => {
+  const file = pfAvatar.files?.[0];
+  if (!file) return;
+  // Basic guard: images only
+  if (!file.type?.startsWith("image/")) return;
+  try {
+    const url = await readFileAsDataURL(file);
+    pfAvatarPreview.src = url;
+    pfAvatarPreview.dataset.avatar = url;
+  } catch (e) {
+    console.warn("Avatar read failed", e);
+  }
+});
+const syncRoleBlocks = () => {
+      const role = (u?.role || "startup");
+      startupBlock.classList.toggle("hidden", role !== "startup");
+      investorBlock.classList.toggle("hidden", role !== "investor");
+      pRole.textContent = role.toUpperCase();
+    };
+
+    // CHANGED: dynamic profile strength based on ACTIVE role fields only
+    const calcStrength = () => {
+      const role = (u?.role || "startup");
+
+      // Only count fields relevant to the current role (avoid hidden fields skewing %)
+      const fieldIds = (role === "startup")
+        ? ["pfName","pfStartup","pfFounder","pfIndustry","pfStage","pfTagline","pfNeed"]
+        : ["pfName","pfFirm","pfType","pfTicket","pfFocus"];
+
+      const fields = fieldIds.map(id => document.getElementById(id)).filter(Boolean);
+
+      const filled = fields.filter(el => String(el.value || "").trim().length > 0).length;
+      const pct = fields.length ? Math.min(100, Math.round((filled / fields.length) * 100)) : 0;
+
+      // Update bar
+      strength.style.width = pct + "%";
+    };
+
+    const fmtMoney = (n) => {
+      if (n === null || n === undefined || n === "") return "—";
+      const num = Number(n);
+      if (Number.isNaN(num)) return String(n);
+      return "$" + num.toLocaleString();
+    };
+
+    
+    // CHANGED: Load profile from DB so UI reflects database (not demo/localStorage)
+    const loadProfileFromDB = async () => {
+      try {
+        const res = await fetch("./get_profile.php", { credentials: "same-origin" });
+        const data = await res.json().catch(() => null);
+        if (!res.ok || !data || !data.ok) return null;
+
+        const baseUser = Foundora.getUser() || {};
+        // Update display name in local user cache (topbar)
+        if (data.display_name) {
+          Foundora.setUser({ ...baseUser, name: data.display_name });
+        }
+
+        const role = (data.role || baseUser.role || "startup");
+        const p = {
+          role,
+          displayName: data.display_name || baseUser.name || "",
+          email: data.email || baseUser.email || "",
+          avatar: (Foundora.getMyProfile() || {})?.avatar || DEFAULT_AVATAR
+        };
+
+        if (role === "startup" && data.startup) {
+          p.startupName = data.startup.startup_name || "";
+          p.founderName = data.startup.founder_name || "";
+          p.industry = data.startup.industry || "";
+          p.stage = data.startup.stage || "";
+          p.description = data.startup.description || "";
+          p.tagline = p.description; // keep old key for UI
+          p.fundingNeeded = data.startup.funding_needed;
+        } else if (role === "investor" && data.investor) {
+          p.firm = data.investor.investor_name || "";
+          p.investorType = data.investor.investor_type || "";
+          p.ticket = data.investor.investor_range || "";
+          p.focus = data.investor.sector_of_interest || "";
+        }
+
+        p.updatedAt = new Date().toISOString();
+        Foundora.saveMyProfile(p);
+        return p;
+      } catch (e) {
+        return null;
+      }
+    };
+
+const renderFullProfile = (p) => {
+      if (!fullProfile) return;
+      const name = p?.displayName || p?.name || u?.name || "—";
+      const role = (p?.role || u?.role || "startup").toUpperCase();
+      const email = p?.email || u?.email || "—";
+
+      
+
+
+const avatarSrc = p?.avatar || saved?.avatar || DEFAULT_AVATAR;
+if (profileAvatar) profileAvatar.src = avatarSrc;
+if (profileHeaderName) profileHeaderName.textContent = name;
+if (profileHeaderMeta) profileHeaderMeta.textContent = `${role} • ${email}`;
+const rows = [
+        ["Name", name],
+        ["Role", role],
+        ["Email", email],
+      ];
+
+      if ((p?.role || u?.role) === "startup") {
+        rows.push(["Startup name", p?.startupName || p?.startup_name || "—"]);
+        rows.push(["Founder name", p?.founderName || p?.founder_name || "—"]);
+        rows.push(["Industry", p?.industry || "—"]);
+        rows.push(["Stage", p?.stage || "—"]);
+        rows.push(["Description", p?.description || p?.tagline || "—"]);
+        rows.push(["Funding needed", (p?.fundingNeeded ?? p?.funding_needed) != null ? fmtMoney(p.fundingNeeded ?? p.funding_needed) : "—"]);
+      } else {
+        rows.push(["Investor name", p?.investorName || p?.investor_name || p?.firm || "—"]);
+        rows.push(["Investor type", p?.investorType || p?.investor_type || "—"]);
+        rows.push(["Investor range", p?.investorRange || p?.investor_range || p?.ticket || "—"]);
+        rows.push(["Sector of interest", p?.sectorOfInterest || p?.sector_of_interest || p?.focus || "—"]);
+      }
+
+      if (p?.updatedAt) {
+        try {
+          rows.push(["Last updated", new Date(p.updatedAt).toLocaleString()]);
+        } catch {}
+      }
+
+      fullProfile.innerHTML = rows.map(([k,v]) => `
+        <div class="rounded-2xl border border-slate-100 bg-white/80 backdrop-blur p-4">
+          <p class="text-[11px] font-semibold text-slate-600">${k}</p>
+          <p class="mt-1 text-sm font-extrabold text-ink">${(v ?? "—")}</p>
+        </div>
+      `).join("");
+    };
+
+    
+// Wire up edit button
+btnEditProfile?.addEventListener("click", () => {
+  const current = Foundora.getMyProfile() || {};
+  const src = current.avatar || saved?.avatar || DEFAULT_AVATAR;
+  if (pfAvatarPreview) {
+    pfAvatarPreview.src = src;
+    delete pfAvatarPreview.dataset.avatar;
+  }
+  if (pfAvatar) pfAvatar.value = "";
+  setEditMode(true);
+});
+
+profileAvatar?.addEventListener("click", () => btnEditProfile?.click());
+btnCloseProfile?.addEventListener("click", () => setEditMode(false));
+    backdrop?.addEventListener("click", () => setEditMode(false));
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") setEditMode(false);
+    });
+
+    // Initial view mode: show saved profile card, hide form
+    setEditMode(false);
+    (async () => {
+      // CHANGED: Load DB profile on page load
+      const p = await loadProfileFromDB();
+      renderFullProfile(p || (Foundora.getMyProfile() || {}));
+    })();
+    syncRoleBlocks();
+    calcStrength();
+
+        form.addEventListener("input", calcStrength);
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      // CHANGED: Save profile to database via update_profile.php (not only localStorage)
+      pfMsg.textContent = "Saving...";
+
+      const role = (u?.role || "startup"); // UI role (DB role comes from PHP session)
+
+      // Build a FormData payload that matches update_profile.php POST keys
+      const fd = new FormData();
+      fd.append("display_name", pfName.value.trim());
+
+      if (role === "startup") {
+        fd.append("startup_name", document.getElementById("pfStartup").value.trim());
+        fd.append("founder_name", document.getElementById("pfFounder").value.trim());
+        fd.append("industry", document.getElementById("pfIndustry").value.trim());
+        fd.append("stage", document.getElementById("pfStage").value);
+        fd.append("description", document.getElementById("pfTagline").value.trim());
+        fd.append("funding_needed", document.getElementById("pfNeed").value.trim());
+      } else {
+        fd.append("investor_name", document.getElementById("pfFirm").value.trim());
+        fd.append("investor_range", document.getElementById("pfTicket").value.trim());
+        fd.append("investor_type", document.getElementById("pfInvType").value.trim());
+        fd.append("sector_of_interest", document.getElementById("pfFocus").value.trim());
+      }
+
+      try {
+        const res = await fetch("./update_profile.php", {
+          method: "POST",
+          body: fd,
+          credentials: "same-origin"
+        });
+
+        const data = await res.json().catch(() => null);
+
+        if (!res.ok || !data || !data.ok) {
+          pfMsg.textContent = "Save failed.";
+          return;
+        }
+
+        // CHANGED: Update localStorage cache so topbar updates instantly
+        const nextUser = { ...(u || {}), name: (data.display_name || pfName.value.trim()) };
+        Foundora.setUser(nextUser);
+
+        // Keep the existing front-end demo profile card in sync (optional, but keeps UI consistent)
+        const profile = {
+          role,
+          displayName: nextUser.name || "",
+          email: (u?.email || nextUser?.email || "")
+        };
+
+        if (role === "startup") {
+          profile.startupName = document.getElementById("pfStartup").value.trim();
+          profile.stage = document.getElementById("pfStage").value;
+          profile.tagline = document.getElementById("pfTagline").value.trim();
+          profile.founderName = document.getElementById("pfFounder").value.trim();
+          profile.industry = document.getElementById("pfIndustry").value.trim();
+          const needVal = document.getElementById("pfNeed").value;
+          profile.fundingNeeded = needVal ? Number(needVal) : null;
+        } else {
+          profile.firm = document.getElementById("pfFirm").value.trim();
+          profile.ticket = document.getElementById("pfTicket").value.trim();
+          profile.focus = document.getElementById("pfFocus").value.trim();
+          profile.investorType = document.getElementById("pfInvType").value.trim();
+        }
+
+        // Avatar (still stored locally for demo)
+        const current = Foundora.getMyProfile() || {};
+        const pickedAvatar = pfAvatarPreview?.dataset?.avatar;
+        profile.avatar = pickedAvatar || current.avatar || DEFAULT_AVATAR;
+
+        profile.updatedAt = new Date().toISOString();
+        Foundora.saveMyProfile(profile);
+
+        // CHANGED: Reload from DB to ensure UI matches database
+        const dbProf = await loadProfileFromDB();
+        if (dbProf) renderFullProfile(dbProf);
+
+        pfMsg.textContent = "Saved to DB.";
+        setTimeout(() => (pfMsg.textContent = ""), 1600);
+
+        // Refresh header + full profile card
+        Foundora.mountTopBar();
+        pName.textContent = nextUser.name || "User";
+        badge.textContent = (nextUser.name || "Foundora")
+          .split(" ")
+          .filter(Boolean)
+          .slice(0, 2)
+          .map(s => s[0].toUpperCase())
+          .join("") || "FD";
+
+        // CHANGED: profile already reloaded from DB above
+        // renderFullProfile(Foundora.getMyProfile() || {});
+        setEditMode(false);
+      } catch (err) {
+        pfMsg.textContent = "Save failed.";
+      }
+    });
+
+  </script>
+</body>
+</html>
